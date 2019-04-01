@@ -1,0 +1,109 @@
+
+def czytaj_z_pliku(nazwa_pliku):               # czyta z pliku
+    f = open(nazwa_pliku, "r" )
+
+    lines = f.readline()
+    
+    x = (lines.split())
+    x = list(map(int, x))
+    
+    zad = x[0]
+    maszyny = x[1]
+   
+    lm = [[] for i in range(maszyny)]
+
+    for i in range(zad):
+        lm_i = f.readline().split()
+        for j in range(maszyny):
+            lm[j].append(int(lm_i[j]))
+    f.close()
+    return lm, zad
+
+
+def licz(lista, zadanie):
+
+    czas = [[] for i in range(len(lista))]
+
+    for k in range(len(czas)):           # uzupelnia pierwsze miejsca list czasu zerami
+        czas[k].append(0)
+
+    for j in range(1,len(zadanie)+1):       # dla pierwszej listy sumuje wszystki wartosci
+        czas[0].append(czas[0][j-1] + lista[0][zadanie[j-1]])
+   
+    for i in range(1, len(lista)):      # dla kolejnych list sprawdza ktora wartosc jest wieksza i dodaje wartosc z listy
+        for j in range(1, len(zadanie)+1):
+            czas[i].append(max(czas[i-1][j], czas[i][j-1]) + lista[i][zadanie[j-1]])
+
+
+    return czas[-1][-1] # zwraca uzyskany czas
+
+def priorytet(index, lista):     # sumuje kolumne
+    sum_p = 0
+    for i in range(len(lista)):
+        sum_p += lista[i][index]
+
+    return sum_p
+
+def sortowanie(lista):      # sortuje rosnaco utworzona liste zadan z wartsciami od 0 do ilosci zadan
+    new_lista = []              # wedlug sumy
+
+    for j in range(len(lista[0])):      # sortowanie indexów
+
+        new_lista.append(j)
+
+    return sorted(new_lista, key=lambda index: priorytet(index, lista), reverse=True)
+
+
+def neh(lista):
+
+    zad_sort = sortowanie(lista)
+    zadanie = []
+    zadanie.append(zad_sort[0])
+    
+    cmax = []
+ 
+    k=1
+    l=0
+
+    for c in range(len(zad_sort)-1):
+
+        for a in range(len(zadanie)+1):
+
+            zadanie.insert(l, zad_sort[k])
+
+            cmax.append(licz(lista, zadanie))
+            zadanie.remove(zadanie[l])
+
+            l += 1
+
+        for b in range(len(cmax)):
+            if (min(cmax) == cmax[b]):
+                zadanie.insert(b,zad_sort[k])
+                break
+        mini = min(cmax)
+        cmax.clear()
+        k += 1
+        l = 0
+
+
+    for i in range(len(zadanie)):
+        zadanie[i] += 1
+
+    return zadanie, mini
+
+
+
+
+czasy, lz,= czytaj_z_pliku("ta038.txt")
+print("liczba maszyn", len(czasy))
+print("liczba zadan", lz)
+
+
+
+lz, cmax = neh(czasy)
+
+
+print("kolejność zadań: ",lz)
+print("Cmax:", cmax)
+
+
