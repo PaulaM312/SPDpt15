@@ -1,0 +1,143 @@
+
+maszyna1 = [5, 4, 9, 7, 2] 
+maszyna2 = [4, 2, 5, 11, 3]  
+
+zad = [0, 1, 2, 3, 4]
+
+def permute(xs, low=0):
+    if low + 1 >= len(xs):
+        yield xs
+    else:
+        for p in permute(xs, low + 1):
+            yield p
+        for i in range(low + 1, len(xs)):
+            xs[low], xs[i] = xs[i], xs[low]
+            for p in permute(xs, low + 1):
+                yield p
+            xs[low], xs[i] = xs[i], xs[low]
+
+# funkcja licząca czas wykonywania wszystkich zadan
+def licz():
+    suma_masz2 = maszyna1[zad[0]]
+    suma_masz1 = 0
+    for i in zad:
+        # suma_masz1
+        suma_masz1 = suma_masz1 + maszyna1[i]
+        # suma_masz2
+        if suma_masz1 > suma_masz2:
+            suma_masz2 = suma_masz1
+        suma_masz2 = suma_masz2 + maszyna2[i]
+    return suma_masz2
+
+
+lista = []
+czasy = []
+
+for p in permute(zad):
+    for i in permute(zad):
+        lista.append(p)
+        czasy.append(licz())
+        # print(p)
+    # print(licz())
+
+    print("permutacja:", p, " Cmax:", licz())
+id = czasy.index(min(czasy))
+print("Najmniejszy czas: ", czasy[id], " dla permutacji: ", lista[id])
+
+#Algorytm Johnsona
+
+print("%%%%%%%%%%% ALGORYTM JOHNSONA DLA 2 MASZYN%%%%%%%%%%")
+
+
+def min(maszyna1):
+    m = maszyna1[0]
+    for i in maszyna1:
+        if i < m:
+            m = i
+    return m
+def min(maszyna2):
+    ma = maszyna2[0]
+    for i in maszyna2:
+        if i < ma:
+            ma = i
+    return ma
+
+AJ1 = []
+AJ2 = []
+
+for i in range(3):
+
+    z = -i
+    AJ1.insert(z, min(maszyna1))
+    x = maszyna1.index(min(maszyna1))
+    AJ2.insert(z, maszyna2[x])
+    maszyna1.remove(min(maszyna1))
+    maszyna2.remove(maszyna2[x])
+    if len(AJ1) == 5:
+      break
+    else:
+        AJ2.insert(i, min(maszyna2))
+        x1 = maszyna2.index(min(maszyna2))
+        AJ1.insert(i, maszyna1[x1])
+        maszyna2.remove(min(maszyna2))
+        maszyna1.remove(maszyna1[x1])
+print(AJ1)
+print(AJ2)
+
+print("%%%%%%%%%%% ALGORYTM JOHNSONA DLA 3 MASZYN%%%%%%%%%%")
+
+ma1 = [5, 4, 9, 7, 2]
+ma2 = [4, 2, 5, 11, 3]
+ma3 = [5, 3, 7, 8, 4]
+
+m1 = [ma2[0]+ma1[0], ma2[1]+ma1[1], ma2[2]+ma1[2], ma2[3]+ma1[3], ma2[4]+ma1[4]]
+m2 = [ma2[0]+ma3[0], ma2[1]+ma3[1], ma2[2]+ma3[2], ma2[3]+ma3[3], ma2[4]+ma3[4]]
+
+
+def min(m1):
+    m = m1[0]
+    for i in m1:
+        if i < m:
+            m = i
+    return m
+def min(m2):
+    ma = m2[0]
+    for i in m2:
+        if i < ma:
+            ma = i
+    return ma
+
+
+algorytm1 = []
+algorytm2 = []
+algorytm3 = []
+
+for i in range(3):
+    z1 = -i
+    x1 = m1.index(min(m1))
+    algorytm1.insert(z1, ma1[x1])
+    algorytm2.insert(z1, ma2[x1])
+    algorytm3.insert(z1, ma3[x1])
+    ma1.remove(ma1[x1])
+    ma2.remove(ma2[x1])
+    ma3.remove(ma3[x1])
+    m1.remove(m1[x1])
+    m2.remove(m2[x1])
+    if len(algorytm1) == 5:
+      break
+    else:
+
+        x1 = m2.index(min(m2))
+        algorytm1.insert(i, ma1[x1])
+        algorytm2.insert(i, ma2[x1])
+        algorytm3.insert(i, ma3[x1])
+        ma1.remove(ma1[x1])
+        ma2.remove(ma2[x1])
+        ma3.remove(ma3[x1])
+        m1.remove(m1[x1])
+        m2.remove(m2[x1])
+
+
+print(algorytm1)
+print(algorytm2)
+print(algorytm3)
