@@ -1,0 +1,84 @@
+import neh2 as neh
+import numpy
+import random
+import math
+
+czasy, lz,= neh.czytaj_z_pliku("ta000.txt")
+print("liczba maszyn", len(czasy))
+print("liczba zadan", lz)
+lz, cmax = neh.neh(czasy)
+
+#rozwiązanie początkowe
+#pi0 =[]
+#for i in range(0,4):#kolejność losowa
+#    r = random.randint(0,3)
+#    pi0.insert(r, i)
+#print(pi0)
+
+#wynik z NEH'a
+pi0 = lz
+l = 0
+l1 = 1
+for i in range(len(pi0)):
+    ind = pi0.index(l1)
+    pi0.remove(l1)
+    pi0.insert(ind, l)
+    l += 1
+    l1 += 1
+
+cmaxpi0 = neh.licz(czasy, pi0)
+
+T0 = 100
+cmax = []
+nowepi =[]
+
+def now_roz(pi0):
+    for i in range(len(pi0)):
+        k = random.randint(0, len(pi0))
+        nowepi.insert(k, pi0[i])
+    return nowepi
+
+def prawdopodobienstwo(cmaxnowepi):
+    cmaxnowepi = neh.licz(czasy, nowepi)
+    if cmaxnowepi >= cmaxpi0:
+        p = math.exp((cmaxpi0 - cmaxnowepi)/T0)
+    else:
+        p = 1
+    return p
+
+while True:
+    nowepi = []
+    nowepi = now_roz(pi0)
+    cmaxnowepi = neh.licz(czasy, nowepi)
+
+    mi = 0.3  # współczynnik schładzania
+    f = mi * T0  # funkcja schładzania.
+    P = prawdopodobienstwo(cmaxnowepi)
+    if P >= random.randint(0, 1):
+        pi0 = nowepi
+
+    else:
+        T0 = f
+    if T0 < 0.2:
+        break
+print("Bez iteracji: ", pi0, "Temperatura: ", T0, 'Cmax: ', neh.licz(czasy, pi0))
+
+
+kmax= []
+for i in range(1, 21):
+    kmax.append(i)
+
+for i in kmax:
+    nowepi = []
+    nowepi = now_roz(pi0)
+    cmaxnowepi = neh.licz(czasy, nowepi)
+    kmaxx = max(kmax)
+    k = i
+    f = T0*(k/kmaxx)  # funkcja schładzania.
+    P = prawdopodobienstwo(cmaxnowepi)
+    if P >= random.randint(0, 1):
+        pi0 = nowepi
+    else:
+        T0 = f
+
+print("Z itreacją: ", pi0, "Temperatura: ", T0, 'Cmax: ', neh.licz(czasy, pi0))
