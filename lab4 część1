@@ -1,0 +1,84 @@
+
+#rj - czas przygotowania
+#pj - czas wykonania
+#qj - czas dostarczen
+
+def czytaj_z_pliku(nazwa_pliku):  # czyta z pliku
+    f = open(nazwa_pliku, "r")
+
+    lines = f.readline()
+
+    x = (lines.split())
+    x = list(map(int, x))
+
+    zad = x[0]
+    maszyny = x[1]
+
+    czasy = [[] for i in range(maszyny)]
+
+    for i in range(zad):
+        lm_i = f.readline().split()
+        for j in range(maszyny):
+            czasy[j].append(int(lm_i[j]))
+    rj = czasy[0]
+    pj = czasy[1]
+    qj = czasy[2]
+    f.close()
+    return rj, pj, qj
+
+def sortowanie(rj):
+    rj_sort = []
+    kol_zad =[]
+    for i in rj:
+        rj_sort.insert(0, max(rj))
+        kol_zad.insert(0, rj.index(max(rj)))
+        rj[rj.index(max(rj))] = 0
+    for i in kol_zad:
+        rj[kol_zad[i]] = rj_sort[i]
+    return rj_sort, kol_zad
+
+
+rj, pj, qj = czytaj_z_pliku("in50.txt")
+rj_sort, kol_zad = sortowanie(rj)
+print("Kolejnośc zadań: ", kol_zad)
+#liczba_zadan = len(rj)
+
+def funkcja_celu(rj):
+    G = []
+    N = [a for a in range(len(rj))]
+    Cmax = 0
+    czas = 0
+    Gr = []
+    Gq = []
+    Gp = []
+
+    for k in range(len(N)):
+        while N and rj and qj and pj and min(rj) <= czas:
+            i = rj.index(min(rj))
+            G.append(i)
+            Gr.append(rj[i])
+            Gp.append(pj[i])
+            Gq.append(qj[i])
+
+            N.pop(i)
+            rj.pop(i)
+            rj_sort.pop(0)
+            pj.pop(i)
+            qj.pop(i)
+
+        if not G:
+            czas = rj_sort[0]
+        else:
+            i = Gq.index(max(Gq))
+            czas += Gp[i]
+            Cmax = max(Cmax, czas + Gq[i])
+            G.pop(i)
+            Gr.pop(i)
+            Gp.pop(i)
+            Gq.pop(i)
+
+    return Cmax
+
+cmax = funkcja_celu(rj)
+
+print("Cmax: ", cmax)
