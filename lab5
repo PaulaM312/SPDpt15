@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+import schrage_bp as bp
+import schrage_zp as zp
+
+rj, pj, qj = bp.czytaj_z_pliku("in50.txt")
+rj_sort, kol_zad = bp.sortowanie(rj)
+
+#cmax = bp.funkcja_celu(rj)
+def Carlier(rj,UB = 1000):
+    a = 0
+    b = 0
+    c = 0
+
+    U = bp.funkcja_celu(rj)  
+
+    if U < UB:  
+        UB  = U 
+    pi = kol_zad
+#b
+    sum_czas_zakon= 0
+    czas_zakonczenia = []
+    for i in range(len(pi)):
+        sum_czas_zakon = max(sum_czas_zakon, rj[pi[i]] + pj[pi[i]])
+        czas_zakonczenia.append(sum_czas_zakon)
+        if sum_czas_zakon + qj[pi[i]] == U:
+            b = i
+
+    #a
+    sum_zad = 0
+    for i in range(b, -1, -1):
+        sum_zad +=pj[pi[i]]
+        if U == sum_zad + rj[pi[i]]+qj[pi[b]] and czas_zakonczenia[i-1] != pj[pi[i]]:
+            a = i
+            break
+
+    #c
+    for i in range(a, b):
+        if qj[pi[i]] < qj[pi[b]]:
+            c = i
+
+    if c < 0:
+        return UB 
+
+    pp = 0
+    rp = rj[pi[c+1]]
+    qp = qj[pi[c+1]]
+    for i in range(c+1, b+1): 
+        pp += pi[i][1]
+        if rp > rj[pi[i]]:
+            rp = rj[pi[i]]
+        if qp > qj[pi[i]]:
+            qp = qj[pi[i]]
+
+    stare = rj[pi[c]]
+    rj[pi[c]]= max(rj[pi[c]], rp+pp)
+
+    pb = 0
+    rb = rj[pi[c]]
+    qb = qj[pi[c]]
+    for i in range(c, b + 1):
+        pb += pj[pi[i]]
+        if rb > rj[pi[i]]:
+            rb = rj[pi[i]]
+        if qb > qj[pi[i]]:
+            qb = qj[pi[i]]
+
+    LB = zp.funkcja_celu(pi)
+    LB = max(max(rp + qp + pp, rb+pb+qb),LB)
+    if LB < UB:
+        UB = Carlier(pi, UB) 
+        rj[pi[c]] = stare
+
+  
+    stare = qj[pi[c]]  
+    qj[pi[c]] = max(qj[pi[c]], qp + pp)
+
+    pb = 0
+    rb = rj[pi[c]]
+    qb = qj[pi[c]]
+    for i in range(c, b + 1):
+        pb += pj[pi[i]]
+        if rb > rj[pi[i]]:
+            rb = rj[pi[i]]
+        if qb > qj[pi[i]]:
+            qb = qj[pi[i]]
+
+    LB, O = zp.funkcja_celu(pi)
+    LB = max(max(rp + qp + pp, rb+pb+qb), LB)
+    if LB < UB: 
+        UB = Carlier(pi, UB)
+    qj[pi[c]] = stare 
+
+    return UB
+
+UB = Carlier(rj,UB = 1000)
+print(UB)
